@@ -194,7 +194,7 @@ class OpenAI(BaseRepresentation):
             updated_topics: Updated topic representations
         """
         # Extract the top n representative documents per topic
-        repr_docs_mappings, _, _, _ = topic_model._extract_representative_docs(c_tf_idf, documents, topics, 500, self.nr_docs, self.diversity)
+        repr_docs_mappings, _, _, repr_docs_ids = topic_model._extract_representative_docs(c_tf_idf, documents, topics, 500, self.nr_docs, self.diversity)
 
         # Generate using OpenAI's Language Model
         updated_topics = {}
@@ -224,7 +224,7 @@ class OpenAI(BaseRepresentation):
                 if choice.finish_reason == "stop":
                     label = choice.message.content.strip().replace("topic: ", "")
                 else:
-                    logger.warn(f"OpenAI Representation - completion had finish_reason {choice.finish_reason}")
+                    logger.warn(f"OpenAI Representation - completion for doc ids: ({repr_docs_ids}) had finish_reason {choice.finish_reason}")
                     label = "No label returned"
             else:
                 if self.exponential_backoff:
