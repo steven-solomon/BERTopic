@@ -7,6 +7,7 @@ from typing import Mapping, List, Tuple, Any, Union, Callable
 from bertopic.representation._base import BaseRepresentation
 from bertopic.representation._utils import retry_with_exponential_backoff, truncate_document
 
+logger = MyLogger("ERROR")
 
 DEFAULT_PROMPT = """
 This is a list of texts where each collection of texts describe a topic. After each collection of texts, the name of the topic they represent is mentioned as a short-highly-descriptive title
@@ -219,9 +220,11 @@ class OpenAI(BaseRepresentation):
 
                 # Check whether content was actually generated
                 # Adresses #1570 for potential issues with OpenAI's content filter
-                if hasattr(response.choices[0].message, "content"):
-                    label = response.choices[0].message.content.strip().replace("topic: ", "")
+                choice = response.choices[0]
+                if choice.finish_reason == "stop":
+                    label = choice.message.content.strip().replace("topic: ", "")
                 else:
+                    logger.warn(f"OpenAI Representation - completion had finish_reason {choice.finish_reason}")
                     label = "No label returned"
             else:
                 if self.exponential_backoff:
