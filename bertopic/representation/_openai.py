@@ -218,9 +218,10 @@ class OpenAI(BaseRepresentation):
                 else:
                     response = self.client.chat.completions.create(**kwargs)
 
-                # Check whether content was actually generated
-                # Adresses #1570 for potential issues with OpenAI's content filter
                 choice = response.choices[0]
+
+                # Check whether content was actually generated
+                # Adresses #1570 finish_reasons are ["stop", "length", "content_filter"]
                 if choice.finish_reason == "stop":
                     label = choice.message.content.strip().replace("topic: ", "")
                 else:
