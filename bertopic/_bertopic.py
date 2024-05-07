@@ -3882,6 +3882,8 @@ class BERTopic:
             repr_docs_indices.append([repr_docs_indices[-1][-1] + i + 1 if index != 0 else i for i in range(nr_docs)])
         repr_docs_mappings = {topic: repr_docs[i[0]:i[-1]+1] for topic, i in zip(topics.keys(), repr_docs_indices)}
 
+        logger.info(f"Extracting Representative Docs - using document ids: {repr_docs_ids}")
+        
         return repr_docs_mappings, repr_docs, repr_docs_indices, repr_docs_ids
 
     def _create_topic_vectors(self, documents: pd.DataFrame = None, embeddings: np.ndarray = None, mappings=None):
